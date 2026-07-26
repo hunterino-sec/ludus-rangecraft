@@ -1,0 +1,94 @@
+network:
+  inter_vlan_default: ACCEPT
+ludus:
+  - vm_name: '{{ range_id }}-elastic'
+    hostname: '{{ range_id }}-elastic'
+    template: debian-12-x64-server-template
+    vlan: 10
+    ip_last_octet: 10
+    ram_gb: 8
+    cpus: 2
+    linux: true
+    roles:
+      - badsectorlabs.ludus_elastic_container
+    role_vars:
+      ludus_elastic_stack_version: 9.4.4
+  - vm_name: '{{ range_id }}-victim'
+    hostname: '{{ range_id }}-victim'
+    template: win11-22h2-x64-enterprise-template
+    vlan: 10
+    ip_last_octet: 11
+    ram_gb: 4
+    cpus: 2
+    windows: {}
+  - vm_name: '{{ range_id }}-victimEDR'
+    hostname: '{{ range_id }}-victimEDR'
+    template: win11-22h2-x64-enterprise-template
+    vlan: 10
+    ip_last_octet: 12
+    ram_gb: 4
+    cpus: 2
+    windows: {}
+    roles:
+      - badsectorlabs.ludus_elastic_agent
+    role_vars:
+      ludus_elastic_agent_version: 9.4.4
+  - vm_name: '{{ range_id }}-litterbox'
+    hostname: '{{ range_id }}-litterbox'
+    template: win2022-server-x64-template
+    vlan: 10
+    ip_last_octet: 13
+    ram_gb: 4
+    cpus: 2
+    windows: {}
+    roles:
+      - whispergate.ludus_litterbox
+    role_vars:
+      ludus_litterbox_host: 0.0.0.0
+  - vm_name: '{{ range_id }}-kali'
+    hostname: '{{ range_id }}-kali'
+    template: kali-x64-desktop-template
+    vlan: 99
+    ip_last_octet: 1
+    ram_gb: 4
+    cpus: 4
+    linux: true
+    testing:
+      snapshot: false
+      block_internet: false
+  - vm_name: '{{ range_id }}-commando'
+    hostname: '{{ range_id }}-commando'
+    template: commando-vm-template
+    vlan: 99
+    ip_last_octet: 10
+    ram_gb: 4
+    cpus: 4
+    windows: {}
+    roles: []
+  - vm_name: '{{ range_id }}-redirector'
+    hostname: '{{ range_id }}-redirector'
+    template: debian-12-x64-server-template
+    vlan: 99
+    ip_last_octet: 12
+    ram_gb: 2
+    cpus: 2
+    linux: true
+    roles:
+      - whispergate.ludus_nginx_redirector
+  - vm_name: '{{ range_id }}-mythic'
+    hostname: '{{ range_id }}-mythic'
+    template: ubuntu-24.04-x64-server-template
+    vlan: 99
+    ip_last_octet: 11
+    ram_gb: 8
+    cpus: 4
+    linux: true
+    roles:
+      - whispergate.ludus_mythic_teamserver
+router:
+  vm_name: MAL-router-debian11-x64
+  hostname: MAL-router-debian11-x64
+  template: debian-11-x64-server-template
+  ram_gb: 2
+  cpus: 2
+  ram_min_gb: 0.5
